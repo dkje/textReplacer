@@ -1,0 +1,17 @@
+{
+	"name": "Text Replacer",
+	"description": "Replace text with settings.",
+	"version": "1.0",
+	"manifest_version": 3,
+	"content_scripts": [
+		{
+			"matches": ["<all_urls>"],
+			"js": ["index.js"]
+		}
+	],
+	"action": {
+		"default_popup": "index.html",
+		"default_title": "Text Replacer"
+	},
+	"permissions": ["storage"]
+}

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Text Replacer</title>
+		<style>
+			* {
+				padding: 0;
+				margin: 0;
+				box-sizing: border-box;
+			}
+			.info_text {
+				color: rgba(0, 0, 0, 0.6);
+			}
+			.marginTopBig {
+				margin-top: 1rem;
+			}
+			.alignRight {
+				text-align: right;
+			}
+
+			body {
+				width: 100%;
+				max-width: 100rem;
+				min-width: 300px;
+				padding: 0.8rem;
+			}
+
+			.container {
+				margin-bottom: 0.8rem;
+			}
+
+			h2 {
+				font-size: 1.2rem;
+				margin-bottom: 4px;
+			}
+			input {
+				margin-bottom: 4px;
+			}
+
+			#saved_list {
+				max-height: 10rem;
+				overflow-y: auto;
+			}
+
+			button, .file_selector::file-selector-button {
+				border-radius: 0;
+				background-color: #333;
+				border: none;
+				color: #fff;
+				padding: 0.2rem 0.4rem;
+				cursor: pointer;
+			}
+
+			.btn_sm {
+				padding: 0 4px;
+				margin-left: 4px;
+			}
+
+			/* 툴팁 스타일 */
+			.tooltip {
+				position: relative;
+				display: inline-block;
+				border-bottom: 1px dotted black;
+			}
+
+			.tooltip .tooltiptext {
+				visibility: hidden;
+				font-size: 0.8rem;
+				width: 80vw;
+				max-width: 300px;
+				background-color: black;
+				color: #fff;
+				border-radius: 6px;
+				padding: 5px;
+
+				/* Position the tooltip */
+				position: absolute;
+				z-index: 1;
+				top: 100%;
+				left: 0;
+			}
+
+			.tooltip:hover .tooltiptext {
+				visibility: visible;
+			}
+
+			/* 스위치 스타일 */
+
+			.switch {
+				position: relative;
+				display: inline-block;
+				width: 50px;
+				height: 28px;
+			}
+
+			.switch input {
+				opacity: 0;
+				width: 0;
+				height: 0;
+			}
+
+			.slider {
+				position: absolute;
+				cursor: pointer;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: #ccc;
+				-webkit-transition: 0.4s;
+				transition: 0.4s;
+			}
+
+			.slider:before {
+				position: absolute;
+				content: "";
+				height: 20px;
+				width: 20px;
+				left: 4px;
+				bottom: 4px;
+				background-color: white;
+				-webkit-transition: 0.4s;
+				transition: 0.4s;
+			}
+
+			input:checked + .slider {
+				background-color: black;
+			}
+
+			input:focus + .slider {
+				box-shadow: 0 0 1px black;
+			}
+
+			input:checked + .slider:before {
+				-webkit-transform: translateX(20px);
+				-ms-transform: translateX(20px);
+				transform: translateX(20px);
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="container">
+			<div class="container">
+				<h2>변경할 텍스트 목록</h2>
+				<div id="saved_list">
+					<span class="info_text"> No settings saved </span>
+				</div>
+			</div>
+			<div>
+				<div class="input_group">
+					<label>대상 텍스트</label>
+					<input id="remove_text" placeholder="text you want to change" />
+				</div>
+				<div class="input_group">
+					<label>변경할 텍스트</label>
+					<input id="new_text" placeholder="replacement text" />
+				</div>
+
+				<div class="btn_group">
+					<button id="add_btn">추가</button>
+					<button id="remove_all_btn">전체 삭제</button>
+				</div>
+			</div>
+
+			<div class="container marginTopBig">
+				<h2 class="tooltip">
+					활성화 페이지
+					<span class="tooltiptext">
+						사이트의 URL이 설정을 일부 포함하는 경우 기능이 활성화 됩니다.
+						<br />
+						ex: URL이 twitter.com인 경우 twitter가 설정되어 있다면 활성화
+					</span>
+				</h2>
+				<div id="matches_list" class="container">
+					<span class="info_text"> No matches saved </span>
+				</div>
+			</div>
+		</div>
+
+		<label>URL 추가</label>
+		<input id="host_input" placeholder="naver.com" />
+		<div class="btn_group">
+			<button id="add_this_page_btn">추가</button>
+			<button id="clear_all_match_btn">전체 삭제</button>
+		</div>
+
+		<div class="container marginTopBig">
+			<h2 class="tooltip">
+				모든 페이지에서 활성화
+				<span class="tooltiptext">
+					[활성화 페이지] 설정을 무시하고 항상 텍스트 대치를 실행합니다
+				</span>
+			</h2>
+			<div>
+				<label class="switch">
+					<input type="checkbox" id="always_active_btn" />
+					<span class="slider"></span>
+				</label>
+			</div>
+		</div>
+
+		<div class="container marginTopBig">
+			<h2 class="tooltip">
+				실행 버튼 표시
+				<span class="tooltiptext">
+					화면 업데이트 후 텍스트 대치가 적용되지 않을시 수동으로 실행하는
+					버튼입니다.
+				</span>
+			</h2>
+			<div>
+				<label class="switch">
+					<input type="checkbox" id="visible_active_btn" />
+					<span class="slider"></span>
+				</label>
+			</div>
+		</div>
+
+		<div class="container">
+			<h2 class="tooltip">
+				설정 파일로 관리
+				<span class="tooltiptext">
+					현재 설정된 정보를 파일로 저장합니다
+				</span>
+			</h2>
+			<div class="container">
+				<button id="export_btn">저장하기</button> 
+				<button id="import_btn">불러오기</button> 
+			</div>
+		</div>
+
+		<p class="info_text alignRight">변경된 설정은 새로고침 후 적용됩니다</p>
+	</body>
+
+	<script src="script.js"></script>
+</html>
